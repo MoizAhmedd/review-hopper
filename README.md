@@ -5,8 +5,9 @@ Review merge requests and pull requests by what matters. A Chrome extension for 
 - **At a glance:** `package.json`, migrations, Prisma schemas, Dockerfiles, CI config and OpenAPI
   specs become summary cards: dependencies added or upgraded, columns added, jobs added,
   endpoints changed, and checks like "no drops" or "non-root". The raw diff is one click away.
-- **Docs rendered:** markdown shows as it will be read on GitLab, with changed blocks marked.
-  Comment on a block and it lands on the source line.
+- **Docs rendered:** markdown shows as it will be read, with changed blocks marked, on GitLab and
+  GitHub, including the HTML READMEs often carry (through a strict allowlist). On GitLab, comment on
+  a block and it lands on the source line.
 - **Noise hidden:** tests, tool config, lockfiles and generated files move to a Hidden group at
   the end of the list.
 - **One file tree** grouped as At a glance, Docs, Code and Hidden, in place of the site's.

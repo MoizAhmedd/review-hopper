@@ -171,12 +171,11 @@ test('markdown: marks added and changed blocks and keeps their source lines', ()
   assert.match(blocks[2].oldHtml!, /<table>/);
 });
 
-test('markdown: escapes HTML in the file and resolves relative links', () => {
+test('markdown: resolves relative links (raw HTML is left for the page script to sanitise)', () => {
   const [block] = markdownDiff(null, '<img src=x onerror=alert(1)> [guide](../guide.md) ![d](img/d.png)', {
     link: 'https://gitlab.com/g/p/-/blob/abc/docs/',
     image: 'https://gitlab.com/g/p/-/raw/abc/docs/',
   });
-  assert.doesNotMatch(block.html, /<img src=x/);
   assert.match(block.html, /href="https:\/\/gitlab\.com\/g\/p\/-\/blob\/abc\/guide\.md"/);
   assert.match(block.html, /src="https:\/\/gitlab\.com\/g\/p\/-\/raw\/abc\/docs\/img\/d\.png"/);
 });

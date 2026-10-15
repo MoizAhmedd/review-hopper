@@ -24,8 +24,8 @@ export interface Links {
 }
 
 function renderer(links?: Links): Md {
-  // html: false escapes raw HTML in the file, so nothing from the repo runs on the page.
-  const md = new MarkdownIt({ html: false, linkify: true });
+  // Raw HTML in the file passes through; the page script sanitises every block before showing it.
+  const md = new MarkdownIt({ html: true, linkify: true });
   if (links) {
     const resolve = (url: string, base: string) => {
       if (/^([a-z]+:|#|\/\/)/i.test(url)) return url;

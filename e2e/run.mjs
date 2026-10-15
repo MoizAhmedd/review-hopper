@@ -98,6 +98,7 @@ async function checkGithub(label, serve) {
   check(s.cards.some((c) => c?.startsWith('Dependencies')), `${label}: package.json becomes a Dependencies card`);
   check(s.cards.some((c) => c?.startsWith('CI pipeline')), `${label}: the workflow becomes a CI card`);
   check(s.hiddenBlocks === 3, `${label}: the 3 test files are hidden`);
+  check(s.markdown === 1, `${label}: README.md renders`);
   check(errors.length === 0, `${label}: no errors from Review Hopper ${errors.join(' | ')}`);
   await page.close();
 }

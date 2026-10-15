@@ -29,7 +29,7 @@ export interface Site {
   /** The base and head commits being compared, once files() has run. Results are cached by it. */
   revision(): string | undefined;
   links(file: SiteFile): Links;
-  /** Present when Review Hopper renders the site's markdown itself. */
+  /** Posts a comment on a line of the new file. Present where the site's API allows it (GitLab). */
   comment?(file: SiteFile, line: number, text: string): Promise<void>;
 }
 

@@ -24,9 +24,9 @@ for word before submitting (AGENTS.md).
 >
 > Review Hopper changes the review page on gitlab.com and GitHub so the parts that need a person come first.
 >
-> At a glance: dependency manifests, database migrations, Dockerfiles, CI config and API specs show as short summaries instead of raw diffs. Packages added and upgraded, columns added, jobs added, endpoints changed, with checks such as "no drops" or "runs as non-root". The raw diff is one click away.
+> Markdown rendered: READMEs, specs and ADRs read the way they'll be published, with what changed marked, on GitLab and GitHub. No more reviewing raw markdown. On GitLab you can comment on a passage and it lands on the source line.
 >
-> Docs rendered: markdown reads the way it will be published, with changed parts marked. On GitLab you can comment on a passage and it lands on the source line.
+> At a glance: dependency manifests, database migrations, Dockerfiles, CI config and API specs show as short summaries instead of raw diffs. Packages added and upgraded, columns added, jobs added, endpoints changed, with checks such as "no drops" or "runs as non-root". The raw diff is one click away.
 >
 > Noise hidden: tests, tool config, lockfiles and generated files move to a Hidden group at the end of the list, one click away.
 >
@@ -37,8 +37,8 @@ for word before submitting (AGENTS.md).
 
 **Graphics:**
 - Icon: `store-icon-128.png` (also in the package)
-- Screenshots, 1280×800, in this order: `shot-migration.png`, `shot-docker.png`, `shot-deps.png`,
-  `shot-tree.png`
+- Screenshots, 1280×800, in this order (the store takes five): `shot-docs.png`, `shot-migration.png`,
+  `shot-docker.png`, `shot-deps.png`, `shot-tree.png`
 - Small promo tile, 440×280: `promo-tile-440x280.png`
 
 **Homepage URL:** https://moizahmedd.github.io/review-hopper/

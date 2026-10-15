@@ -7,7 +7,7 @@
     "watch": "node scripts/build.ts --watch",
     "test": "node --test \"test/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p .",
-    "e2e": "node e2e/run.mjs",
+    "e2e": "node e2e/run.mjs && node e2e/sanitize.mjs",
     "zip": "npm run build && cd dist && zip -qr ../review-hopper.zip ."
   },
   "author": "Moiz Ahmed",

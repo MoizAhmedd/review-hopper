@@ -132,7 +132,7 @@ class Review {
     else delete slot.dataset.rhHide;
     slot.dataset.rhOrder = this.hidden.has(file) ? '4' : CARD_KINDS.has(kind) ? '1' : ORDER[kind] ?? '3';
     const wantsCard = this.settings.cards && CARD_KINDS.has(kind) && file.status !== 'removed';
-    const wantsMarkdown = this.settings.markdown && kind === 'docs' && !!this.site.comment && file.status !== 'removed';
+    const wantsMarkdown = this.settings.markdown && kind === 'docs' && file.status !== 'removed';
     if ((wantsCard || wantsMarkdown) && !this.mounted.get(file.path)?.isConnected) this.mount(file, kind, block, wantsCard ? 'card' : 'markdown');
   }
 
@@ -166,9 +166,9 @@ class Review {
         else {
           const comment = this.site.comment?.bind(this.site);
           view = h('div', { class: 'rh' },
-            h('div', { class: 'rh rh-note', style: 'display:flex;align-items:center' }, 'Rendered by Review Hopper. Hover a changed block to comment on it.',
+            h('div', { class: 'rh rh-note', style: 'display:flex;align-items:center' }, comment ? 'Rendered by Review Hopper. Hover a changed block to comment on it.' : 'Rendered by Review Hopper. Switch to the diff to comment.',
               h('button', { class: 'rh-btn', style: 'margin-left:auto', onclick: () => showRaw() }, 'Diff')),
-            markdownView(res.blocks, res.addedLines, comment && ((line, text) => comment(file, line, text))));
+            markdownView(res.blocks, res.addedLines, this.site.links(file), comment && ((line, text) => comment(file, line, text))));
         }
         showView();
       } catch (error) {
