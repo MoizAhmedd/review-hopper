@@ -1,7 +1,6 @@
 <!doctype html>
 <!-- Layout from the ship-utility landing template, with an Add to Chrome button and screenshots.
-     DRAFT COPY: the headline, lede and captions are placeholders until Moiz writes or approves them
-     word for word (AGENTS.md). Add to Chrome links to the README install section until the store listing is live. -->
+     Copy approved by Moiz word for word on 2026-10-15; changes go back to him first (AGENTS.md). Add to Chrome links to the README install section until the store listing is live. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -64,7 +63,10 @@ h1 em{color:var(--accent)}
 .pair img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:12px}
 .pair figcaption{margin-top:10px;font-size:14px;color:var(--muted)}
 .pair .with figcaption{color:var(--accent);font-weight:600}
-.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;margin:72px 0 0}
+.glance{margin:120px 0 0;padding-top:72px;border-top:1px solid var(--rule);text-align:center}
+.glance h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.8vw,50px);line-height:1.08;max-width:820px;margin:0 auto}
+.glance h2 em{color:var(--accent)}
+.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;margin:40px 0 0;text-align:left}
 .shot figure{margin:0}
 .shot img{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:12px;background:var(--card)}
 .shot figcaption{margin-top:10px;font-size:15px;color:var(--ink-2);text-align:center}
@@ -110,11 +112,14 @@ footer a{color:var(--muted)}
   </div>
 </section>
 
-<section class="shots">
+<section class="glance">
+  <h2>Dependencies, migrations, Dockerfiles and CI <em>as summaries.</em></h2>
+  <div class="shots">
   <div class="shot"><figure><img src="shot-deps.png" alt="A dependency bump shown as a summary"><figcaption>Dependency bumps, at a glance</figcaption></figure></div>
   <div class="shot"><figure><img src="shot-migration.png" alt="A Prisma migration shown as tables"><figcaption>Migrations as tables</figcaption></figure></div>
   <div class="shot"><figure><img src="shot-docker.png" alt="A Dockerfile change shown as an image summary"><figcaption>Dockerfiles as images</figcaption></figure></div>
   <div class="shot"><figure><img src="shot-tree.png" alt="A large pull request with tests and generated files hidden"><figcaption>Tests out of the way</figcaption></figure></div>
+</div>
 </section>
 
 <ul class="facts">

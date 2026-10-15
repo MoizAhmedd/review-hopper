@@ -3,8 +3,8 @@
 Everything to paste into the [developer dashboard](https://chrome.google.com/webstore/devconsole).
 Upload `review-hopper.zip` (run `npm run zip`).
 
-**Status:** DRAFT. The summary and description are promotional copy, so Moiz approves them word
-for word before submitting (AGENTS.md).
+**Status:** Approved by Moiz on 2026-10-15. Any change to the summary or description goes back to him
+first (AGENTS.md).
 
 ## Package
 
