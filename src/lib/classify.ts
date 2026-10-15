@@ -18,7 +18,7 @@ export type Kind =
 export const CARD_KINDS: ReadonlySet<Kind> = new Set(['deps', 'database', 'docker', 'ci', 'openapi']);
 
 /** Kinds kept out of sight unless the reviewer asks for them. */
-export const HIDDEN_KINDS: ReadonlySet<Kind> = new Set(['tests', 'config', 'lockfile', 'generated']);
+const HIDDEN_KINDS: ReadonlySet<Kind> = new Set(['tests', 'config', 'lockfile', 'generated']);
 
 export interface ChangedFile {
   path: string;

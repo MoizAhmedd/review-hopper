@@ -19,8 +19,8 @@ export interface Site {
   files(): Promise<SiteFile[]>;
   /** The file's block on the page, once the site has rendered it. */
   element(file: SiteFile): HTMLElement | null;
-  /** The file block's header and its diff body, which Review Hopper swaps for a card. */
-  parts(block: HTMLElement): { header: HTMLElement; body: HTMLElement } | null;
+  /** The file block's diff body, which Review Hopper swaps for a card. */
+  body(block: HTMLElement): HTMLElement | null;
   /** The container of the file blocks, for ordering and the hidden-files bar. */
   list(): HTMLElement | null;
   /** The site's own file tree, which Review Hopper's tree replaces. */

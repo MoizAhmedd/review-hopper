@@ -58,11 +58,7 @@ export const gitlab: Site = {
     return found;
   },
 
-  parts(block) {
-    const header = block.querySelector<HTMLElement>('.rd-diff-file-header');
-    const body = block.querySelector<HTMLElement>('.rd-diff-file-body');
-    return header && body ? { header, body } : null;
-  },
+  body: (block) => block.querySelector<HTMLElement>('.rd-diff-file-body'),
 
   list: () => document.querySelector<HTMLElement>('.rd-app-diffs-list'),
   tree: () => document.querySelector<HTMLElement>('.rd-app-sidebar'),

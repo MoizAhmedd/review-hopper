@@ -24,7 +24,7 @@ const lines = (fs: SiteFile[]) => fs.reduce((n, f) => n + f.added + f.removed, 0
 const collapsed = new Set<string>();
 
 /** "6 tests · 1 generated": what the hidden files are. */
-export function hiddenSummary(m: TreeModel): string[] {
+function hiddenSummary(m: TreeModel): string[] {
   const counts = new Map<Kind, number>();
   for (const f of m.hidden) counts.set(m.kinds.get(f)!, (counts.get(m.kinds.get(f)!) ?? 0) + 1);
   return [...counts].map(([k, n]) => plural(n, HIDDEN_LABEL[k] ?? k));

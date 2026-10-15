@@ -22,7 +22,8 @@ export const CSS = `
 [data-rh-list] { display: flex !important; flex-direction: column; }
 [data-rh-flat] { display: contents !important; }
 /* The list's own extras (GitHub's "You made it to the end!", loading markers) go after the files. */
-[data-rh-list] > :not([data-rh-order]):not([data-rh-flat]):not(.rh-band) { order: 95; }
+[data-rh-list] > :not([data-rh-order]):not([data-rh-flat]):not(.rh-band),
+[data-rh-flat] > :not([data-rh-order]):not([data-rh-flat]) { order: 95; }
 [data-rh-order="1"] { order: 1 !important; }
 [data-rh-order="2"] { order: 2 !important; }
 [data-rh-order="3"] { order: 3 !important; }

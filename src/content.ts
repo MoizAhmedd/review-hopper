@@ -138,19 +138,19 @@ class Review {
 
   /** Swaps the file's diff for a card or rendered markdown. */
   private mount(file: SiteFile, kind: Kind, block: HTMLElement, mode: 'card' | 'markdown') {
-    const parts = this.site.parts(block);
-    if (!parts) return;
+    const body = this.site.body(block);
+    if (!body) return;
     const holder = h('div', { class: 'rh rh-holder' }, h('div', { class: 'rh-note' }, 'Review Hopper is reading this file…'));
-    parts.body.before(holder);
-    parts.body.dataset.rhHide = '';
+    body.before(holder);
+    body.dataset.rhHide = '';
     this.mounted.set(file.path, holder);
     let view: HTMLElement | undefined;
     const showRaw = (note?: string) => {
-      delete parts.body.dataset.rhHide;
+      delete body.dataset.rhHide;
       holder.replaceChildren(h('div', { class: 'rh-note' }, note ?? 'Showing the diff. ', view ? h('button', { class: 'rh-btn', onclick: showView }, mode === 'card' ? 'Back to summary' : 'Back to rendered') : null));
     };
     const showView = () => {
-      parts.body.dataset.rhHide = '';
+      body.dataset.rhHide = '';
       holder.replaceChildren(view!);
     };
     const load = async () => {

@@ -23,14 +23,16 @@ npm install && npm run build
 Then `chrome://extensions` → Developer mode → Load unpacked → `dist/`.
 
 Works on gitlab.com merge requests (the Changes tab on Rapid Diffs, GitLab's default) and on
-GitHub pull requests (the Files changed page when signed in).
+GitHub pull requests (the Files changed page, current or classic).
 
 ## Develop
 
 ```sh
 npm test          # classification and parsers
 npm run typecheck
-npm run e2e       # loads dist/ in Chrome for Testing on a real GitLab MR and a saved GitHub page
+npm run e2e       # loads dist/ in Chrome for Testing on a public GitLab MR and GitHub PR
+node e2e/shots.mjs      # store and landing screenshots from public PRs
+node demo/plates.mjs    # demo screenshots; then in demo/: npm i && node render.mjs ../site/public/demo.mp4
 ```
 
 `src/sites/` has one adapter per site; `src/lib/parsers/` turns a file's old and new versions into

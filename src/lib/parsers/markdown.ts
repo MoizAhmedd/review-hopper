@@ -61,7 +61,7 @@ interface Raw {
 
 /** Top-level blocks: each heading, paragraph, list, table, fence or quote on its own. */
 /** Blanks out YAML front matter, keeping the line count so source lines still match. */
-export function withoutFrontMatter(text: string): string {
+function withoutFrontMatter(text: string): string {
   const m = /^---\r?\n[\s\S]*?\n---[ \t]*(\r?\n|$)/.exec(text);
   return m ? m[0].replace(/[^\n]/g, '') + text.slice(m[0].length) : text;
 }

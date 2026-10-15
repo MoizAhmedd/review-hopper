@@ -1,6 +1,9 @@
-// GitHub pull requests, on the Files changed page for signed-in users. Each file block's id is
-// "diff-" + sha256(path), and the page's embedded data lists every file and the two commits.
-// GitHub's CSS class names are hashed per build, so nothing here selects on them.
+// GitHub pull requests, on both Files changed pages. Each file block's id is "diff-" + sha256(path)
+// on either one.
+// - The current page (signed in): a React app whose embedded data lists every file and the two
+//   commits. Its CSS class names are hashed per build, so nothing here selects on them.
+// - The classic page (signed out, or opted out of the new one): server-rendered `.file` blocks that
+//   load in batches as you scroll, with the commits in their diff URLs.
 
 import { type Site, type SiteFile, text } from './site.ts';
 
@@ -55,9 +58,40 @@ function embedded(doc: Document): PullData | undefined {
   return undefined;
 }
 
+const isClassic = () => !!document.querySelector('.file[data-tagsearch-path]') && !document.querySelector('[data-testid="progressive-diffs-list"]');
+
+/** The classic page, read fresh each time because its file blocks arrive in batches. */
+function classic(): PullData | undefined {
+  const url = document.querySelector('[data-url*="base_commit_oid="]')?.getAttribute('data-url') ?? '';
+  const q = new URLSearchParams(url.split('?')[1] ?? '');
+  let base = q.get('base_commit_oid'), head = q.get('end_commit_oid');
+  const range = /\/diffs\/([0-9a-f]{40})\.\.([0-9a-f]{40})/.exec(document.querySelector('deferred-diff-lines')?.getAttribute('data-url') ?? '');
+  if ((!base || !head) && range) [base, head] = [range[1], range[2]];
+  const blocks = [...document.querySelectorAll<HTMLElement>('.file[data-tagsearch-path]')];
+  if (!base || !head || !blocks.length) return undefined;
+  const summaries = blocks.map((b): Summary => {
+    const info = b.querySelector('.file-info')?.textContent ?? '';
+    const n = (re: RegExp) => Number(re.exec(info)?.[1] ?? 0);
+    return {
+      path: b.dataset.tagsearchPath!,
+      pathDigest: b.id.replace(/^diff-/, ''),
+      changeType: b.dataset.fileDeleted === 'true' ? 'REMOVED' : 'MODIFIED',
+      linesAdded: n(/(\d+) additions?/),
+      linesDeleted: n(/(\d+) deletions?/),
+    };
+  });
+  return { baseOid: base, headOid: head, summaries, oldPaths: new Map() };
+}
+
 async function pull(): Promise<PullData> {
   const m = PULL.exec(location.pathname)!;
   const key = `${m[1]}/${m[2]}#${m[3]}`;
+  if (isClassic()) {
+    const data = classic();
+    if (!data) throw new Error('could not read the classic Files changed page');
+    cache = { key, data };
+    return data;
+  }
   if (cache?.key === key) return cache.data;
   // After in-app navigation the embedded data can belong to another page, so check the file
   // blocks on screen match it, and otherwise read the files page fresh.
@@ -101,18 +135,18 @@ export const github: Site = {
     return digest ? document.getElementById(`diff-${digest}`) : null;
   },
 
-  parts(block) {
-    const header = block.querySelector<HTMLElement>('[data-diff-header-wrapper]');
-    const body = header?.nextElementSibling as HTMLElement | null;
-    return header && body ? { header, body } : null;
+  body(block) {
+    if (block.matches('.file')) return block.querySelector<HTMLElement>('.js-file-content');
+    return (block.querySelector('[data-diff-header-wrapper]')?.nextElementSibling as HTMLElement | null) ?? null;
   },
 
   list() {
+    if (isClassic()) return document.getElementById('files');
     const list = document.querySelector<HTMLElement>('[data-testid="progressive-diffs-list"]');
     return list ?? (document.querySelector('[id^="diff-"][role="region"]')?.parentElement?.parentElement as HTMLElement | null) ?? null;
   },
 
-  tree: () => document.getElementById('pr-file-tree'),
+  tree: () => (isClassic() ? document.querySelector<HTMLElement>('file-tree') : document.getElementById('pr-file-tree')),
 
   async content(file, side) {
     const data = await pull();

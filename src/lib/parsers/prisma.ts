@@ -4,7 +4,7 @@ import { type Card, type Item, type Pill, count, pill } from '../card.ts';
 
 type Block = { kind: string; name: string; fields: Map<string, string> };
 
-export function prismaBlocks(text: string): Map<string, Block> {
+function prismaBlocks(text: string): Map<string, Block> {
   const out = new Map<string, Block>();
   for (const m of text.matchAll(/^(model|enum|view|type)\s+(\w+)\s*\{([\s\S]*?)^\}/gm)) {
     const fields = new Map<string, string>();

@@ -39,6 +39,19 @@ function describe(job: Obj, github: boolean): string {
   return bits.join(' · ');
 }
 
+/** A variable's value as one short string; GitLab allows { value, description } objects. */
+const varValue = (v: unknown) => (v && typeof v === 'object' ? String(obj(v).value ?? JSON.stringify(v)) : String(v));
+
+function variableChanges(a: Obj, b: Obj): Item[] {
+  const items: Item[] = [];
+  for (const [k, v] of Object.entries(b)) {
+    if (!(k in a)) items.push({ sign: '+', name: k, detail: varValue(v) });
+    else if (varValue(a[k]) !== varValue(v)) items.push({ sign: '↑', name: k, detail: `${varValue(a[k])} → ${varValue(v)}` });
+  }
+  for (const k of Object.keys(a)) if (!(k in b)) items.push({ sign: '−', name: k, detail: varValue(a[k]) });
+  return items;
+}
+
 export function ciCard(path: string, oldText: string | null, newText: string): Card {
   const github = path.startsWith('.github/');
   const a = jobs(path, oldText), b = jobs(path, newText);
@@ -67,6 +80,10 @@ export function ciCard(path: string, oldText: string | null, newText: string): C
   const sections: Card['sections'] = [];
   if (items.length) sections.push({ type: 'list', items });
   const before = obj(parse(oldText ?? '{}')), after = obj(parse(newText));
+  // Pipeline-wide variables: GitHub's top-level env, GitLab's variables.
+  const varKey = github ? 'env' : 'variables';
+  const vars = variableChanges(obj(before[varKey]), obj(after[varKey]));
+  if (vars.length && oldText !== null) sections.push({ type: 'list', title: 'Variables', items: vars });
   if (github) {
     // YAML 1.2 reads `on:` as a plain key.
     const triggers = after.on;
@@ -74,8 +91,9 @@ export function ciCard(path: string, oldText: string | null, newText: string): C
       const value = typeof triggers === 'string' ? triggers : Array.isArray(triggers) ? triggers.join(', ') : Object.keys(obj(triggers)).join(', ');
       sections.push({ type: 'rows', rows: [{ key: 'Triggers', value }] });
     }
-  } else if (oldText !== null) {
-    const keys = ['stages', 'variables', 'include', 'workflow', 'default'].filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]));
+  }
+  if (oldText !== null) {
+    const keys = (github ? ['permissions', 'concurrency', 'defaults'] : ['stages', 'include', 'workflow', 'default']).filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]));
     if (keys.length) sections.push({ type: 'rows', rows: [{ key: 'Also changed', value: keys.join(', '), mono: true }] });
   }
   if (!items.length && !sections.length) pills.unshift(pill('formatting only', 'muted'));

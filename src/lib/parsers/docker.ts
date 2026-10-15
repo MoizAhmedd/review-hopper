@@ -13,7 +13,7 @@ interface Stage {
   steps: Instruction[];
 }
 
-export interface Image {
+interface Image {
   stages: Stage[];
   /** Facts about the final stage, the image that ships. */
   base: string;
@@ -26,7 +26,7 @@ export interface Image {
   unpinned: string[];
 }
 
-export function instructions(text: string): Instruction[] {
+function instructions(text: string): Instruction[] {
   const out: Instruction[] = [];
   const lines = text.replace(/\\\r?\n/g, ' ').split(/\r?\n/);
   for (const raw of lines) {
@@ -49,7 +49,7 @@ function envPairs(args: string): [string, string][] {
   return [...args.matchAll(/([\w.-]+)=("[^"]*"|'[^']*'|\S*)/g)].map((m) => [m[1], m[2]]);
 }
 
-export function readImage(text: string): Image {
+function readImage(text: string): Image {
   const args = new Map<string, string>();
   const stages: Stage[] = [];
   for (const ins of instructions(text)) {
@@ -61,11 +61,13 @@ export function readImage(text: string): Image {
     if (ins.op === 'FROM') {
       const m = /^(?:--platform=\S+\s+)?(\S+)(?:\s+AS\s+(\S+))?/i.exec(ins.args)!;
       const from = m[1].replace(/\$\{?(\w+)\}?/g, (_, k) => args.get(k) ?? `$${k}`);
-      stages.push({ name: m[2] ?? `stage ${stages.length + 1}`, from, steps: [] });
+      stages.push({ name: m[2] ?? '', from, steps: [] });
       continue;
     }
     stages.at(-1)?.steps.push(ins);
   }
+  // Unnamed stages: "final" for the one that ships, "stage N" for the rest.
+  stages.forEach((s, i) => (s.name ||= i === stages.length - 1 ? 'final' : `stage ${i + 1}`));
   const last = stages.at(-1) ?? { name: '', from: '', steps: [] };
   const final = (op: string) => last.steps.filter((s) => s.op === op).at(-1)?.args ?? '';
   const env = last.steps.filter((s) => s.op === 'ENV').flatMap((s) => envPairs(s.args));

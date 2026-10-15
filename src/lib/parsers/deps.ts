@@ -84,7 +84,7 @@ const lockText = (l: LockSummary) =>
     : `${count(l.added + l.removed + l.changed, 'package')} changed underneath (${l.added} added, ${l.changed} upgraded, ${l.removed} removed)`;
 
 /** name → versions resolved in a lockfile. Understands npm, pnpm and yarn lockfiles. */
-export function lockVersions(path: string, text: string): Map<string, Set<string>> {
+function lockVersions(path: string, text: string): Map<string, Set<string>> {
   const out = new Map<string, Set<string>>();
   const add = (name: string, version: string) => {
     if (!out.has(name)) out.set(name, new Set());

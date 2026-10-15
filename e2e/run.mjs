@@ -11,7 +11,8 @@ mkdirSync(out, { recursive: true });
 
 const GITLAB = 'https://gitlab.com/gitlab-org/gitlab/-/merge_requests/261928/diffs';
 const GITHUB = 'https://github.com/MoizAhmedd/mcp-here/pull/1/files';
-// GitHub serves logged-out visitors its old Files page, so the signed-in page Moiz saved stands in.
+// Signed out, GitHub serves its classic Files page. The current (signed-in) page is checked against a
+// copy Moiz saved, when it's present; it holds his session details, so it's gitignored.
 const SAVED = `${root}design/github-pr-files.html`;
 
 const browser = await puppeteer.launch({ headless: true, enableExtensions: [`${root}dist`], defaultViewport: { width: 1440, height: 1000, deviceScaleFactor: 2 } });
@@ -81,22 +82,29 @@ if (process.env.ONLY !== 'github') {
   await page.close();
 }
 
-// GitHub
-if (existsSync(SAVED)) {
-  const { page, errors, siteErrors } = await open(GITHUB, { serve: readFileSync(SAVED, 'utf8') });
+async function checkGithub(label, serve) {
+  const { page, errors, siteErrors } = await open(GITHUB, { serve });
+  // The classic page loads files in batches as you scroll.
+  await page.evaluate(async () => {
+    for (let i = 0; i < 15; i++) {
+      window.scrollTo(0, document.body.scrollHeight);
+      await new Promise((r) => setTimeout(r, 600));
+    }
+  });
   await loadAll(page);
   const s = await summary(page);
-  console.log('GitHub', JSON.stringify({ ...s, siteErrors }, null, 1));
-  check(s.head?.includes('of 31 files'), 'GitHub: tree counts all 31 files');
-  check(s.cards.some((c) => c?.startsWith('Dependencies')), 'GitHub: package.json becomes a Dependencies card');
-  check(s.cards.some((c) => c?.startsWith('CI pipeline')), 'GitHub: the workflow becomes a CI card');
-  check(errors.length === 0, `GitHub: no errors from Review Hopper ${errors.join(' | ')}`);
-  await page.evaluate(() => { document.querySelector('.rh-card')?.closest('[data-rh-order]')?.scrollIntoView(); window.scrollBy(0, -120); });
-  await page.screenshot({ path: `${out}/github-card.png` });
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.screenshot({ path: `${out}/github-tree.png` });
+  console.log(label, JSON.stringify({ ...s, siteErrors }, null, 1));
+  check(s.head?.includes('of 31 files'), `${label}: tree counts all 31 files`);
+  check(s.cards.some((c) => c?.startsWith('Dependencies')), `${label}: package.json becomes a Dependencies card`);
+  check(s.cards.some((c) => c?.startsWith('CI pipeline')), `${label}: the workflow becomes a CI card`);
+  check(s.hiddenBlocks === 3, `${label}: the 3 test files are hidden`);
+  check(errors.length === 0, `${label}: no errors from Review Hopper ${errors.join(' | ')}`);
   await page.close();
-} else console.log('skipped GitHub: design/github-pr-files.html is missing');
+}
+
+await checkGithub('GitHub classic');
+if (existsSync(SAVED)) await checkGithub('GitHub signed-in', readFileSync(SAVED, 'utf8'));
+else console.log('skipped the signed-in GitHub page: design/github-pr-files.html is missing');
 
 await browser.close();
 console.log(failures ? `${failures} failed` : 'all passed');

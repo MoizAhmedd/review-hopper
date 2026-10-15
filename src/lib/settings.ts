@@ -9,7 +9,7 @@ export interface Settings {
   markdown: boolean;
 }
 
-export const DEFAULTS: Settings = {
+const DEFAULTS: Settings = {
   enabled: true,
   hide: { tests: true, config: true, lockfile: true, generated: true },
   cards: true,

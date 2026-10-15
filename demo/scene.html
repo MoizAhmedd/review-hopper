@@ -1,0 +1,139 @@
+<!doctype html>
+<!--
+  Review Hopper's demo, drawn as a scene (demo-video skill): render(t) paints the frame for time t.
+  The pictures are real screenshots of public GitHub PRs with and without the extension, taken by
+  plates.mjs, which also wrote the card positions into plates.js. Open in a browser to watch it loop.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Review Hopper demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0d1117; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; position: relative; }
+  .abs { position: absolute; }
+  #world { inset: 0; transform-origin: 0 0; }
+  .plate { left: 0; top: 0; width: 1920px; height: 1080px; }
+  #pointer { width: 28px; height: 40px; transform-origin: 3px 2px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+  #ripple { width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid rgba(111,199,168,.85); }
+
+  #end { inset: 0; background: #121413; color: #ecebe6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; }
+  #end .name { display: flex; align-items: center; gap: 28px; font: 600 96px/1 -apple-system, "SF Pro Display", sans-serif; letter-spacing: -2px; }
+  #end .name img { width: 120px; height: 120px; }
+  #end .cta { font: 600 34px -apple-system, sans-serif; background: #ecebe6; color: #121413; padding: 18px 40px; border-radius: 999px; }
+  #end .where { font: 400 26px -apple-system, sans-serif; color: #9a9a93; }
+</style>
+<script src="plates.js"></script>
+</head>
+<body>
+
+<div id="world" class="abs">
+  <img id="cal-before" class="abs plate" src="plates/cal-before.png">
+  <img id="cal-after" class="abs plate" src="plates/cal-after.png">
+  <img id="n8n-after" class="abs plate" src="plates/n8n-after.png">
+  <img id="mcp-after" class="abs plate" src="plates/mcp-after.png">
+  <img id="mcp-shown" class="abs plate" src="plates/mcp-shown.png">
+  <div id="ripple" class="abs"></div>
+  <svg id="pointer" class="abs" viewBox="0 0 28 40"><path d="M3 2v29l7.5-7 5 11.5 5-2.2-5-11.3H26z" fill="#fff" stroke="#000" stroke-width="2" stroke-linejoin="round"/></svg>
+</div>
+
+<div id="end" class="abs">
+  <div class="name"><img src="../static/icons/icon.svg" alt="">Review Hopper</div>
+  <div class="cta">Add to Chrome</div>
+  <div class="where">gitlab.com merge requests · GitHub pull requests</div>
+</div>
+
+<script>
+const W = 1920, H = 1080;
+const DURATION = 14;
+const P = window.PLATES;
+const center = ([x, y, w, h], dx = 0.5, dy = 0.5) => [x + w * dx, y + h * dy];
+
+// Beats: GitHub as it is, then Review Hopper on the same PR (1.6 s), the migration card, the
+// Docker card, the tree hiding tests and a click to show them, the end card.
+const SCENES = [
+  // [plate id, in at, gone by, fade in?] Later plates sit on top; the click swaps without a fade.
+  ['cal-before', -1, 2.2, true],
+  ['cal-after', 1.6, 6.1, true],
+  ['n8n-after', 5.6, 10.1, true],
+  ['mcp-after', 9.6, 11.05, true],
+  ['mcp-shown', 11.05, 99, false],
+];
+const FADE = 0.5;
+
+const [calX, calY] = center(P['cal-after'].card, 0.27, 0.55);
+const [dockX, dockY] = center(P['n8n-after'].card, 0.4, 0.5);
+const hidden = center(P['mcp-after'].hidden, 0.25, 0.5);
+const [treeX, treeY] = center(P['mcp-after'].tree, 0.6, 0.62);
+
+const CAMERA = [
+  [0, 1, 960, 540], [2.2, 1, 960, 540],
+  [2.9, 1.75, calX, calY], [5.0, 1.75, calX, calY],
+  [5.6, 1, 960, 540], [6.1, 1, 960, 540],
+  [6.8, 1.5, dockX, dockY], [9.0, 1.5, dockX, dockY],
+  [9.6, 1, 960, 540], [10.0, 1, 960, 540],
+  [10.6, 1.9, treeX, treeY], [12.4, 1.9, treeX, treeY],
+];
+const POINTER_IN = 10.1, CLICK = 11.0, END = 12.6;
+const CURSOR = [
+  [0, 520, 820], [10.2, 520, 820],
+  [10.9, hidden[0], hidden[1]], [DURATION, hidden[0], hidden[1]],
+];
+
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = (x) => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const lerp = (a, b, x) => a + (b - a) * x;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+
+function track(keys, t) {
+  let i = 0;
+  while (i < keys.length - 1 && t >= keys[i + 1][0]) i++;
+  const a = keys[i], b = keys[Math.min(i + 1, keys.length - 1)];
+  const x = a === b ? 0 : ease(seg(t, a[0], b[0]));
+  return a.slice(1).map((v, j) => lerp(v, b[j + 1], x));
+}
+
+function render(t) {
+  const [s, fx, fy] = track(CAMERA, t);
+  const tx = clamp(W / 2 - fx * s, W - W * s, 0), ty = clamp(H / 2 - fy * s, H - H * s, 0);
+  $('world').style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+
+  // Each plate fades in over the one before it.
+  SCENES.forEach(([id, a, b, fade], i) => {
+    const el = $(id);
+    const shown = t >= a && t < b ? (fade ? seg(t, a, a + FADE) : 1) : 0;
+    el.style.zIndex = i;
+    el.style.opacity = shown;
+    el.style.display = shown > 0 ? 'block' : 'none';
+  });
+
+  const [cx, cy] = track(CURSOR, t);
+  const pointer = $('pointer');
+  pointer.style.zIndex = 9;
+  pointer.style.opacity = seg(t, POINTER_IN, POINTER_IN + 0.3);
+  pointer.style.left = (cx - 3) + 'px'; pointer.style.top = (cy - 2) + 'px';
+  pointer.style.transform = t >= CLICK && t < CLICK + 0.12 ? 'scale(.85)' : 'none';
+  const ripple = $('ripple');
+  ripple.style.zIndex = 8;
+  if (t >= CLICK && t < CLICK + 0.45) {
+    const x = seg(t, CLICK, CLICK + 0.45);
+    Object.assign(ripple.style, { display: 'block', left: cx + 'px', top: cy + 'px', opacity: 0.85 * (1 - x), transform: `scale(${0.4 + 1.2 * ease(x)})` });
+  } else ripple.style.display = 'none';
+
+  const end = $('end');
+  const ea = seg(t, END, END + 0.45);
+  end.style.display = ea > 0 ? 'flex' : 'none';
+  end.style.opacity = ea;
+}
+
+window.DURATION = DURATION;
+window.render = render;
+if (!location.search.includes('capture')) {
+  const t0 = performance.now();
+  (function loop() { render(((performance.now() - t0) / 1000) % (DURATION + 1)); requestAnimationFrame(loop); })();
+} else render(0);
+</script>
+</body>
+</html>

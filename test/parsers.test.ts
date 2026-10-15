@@ -211,3 +211,16 @@ components:
   assert.deepEqual(section(card, 'list').items.map((i) => `${i.sign} ${i.name} ${i.detail ?? ''}`.trim()), ['↑ POST /api/v4/projects/{id}/export parameters']);
   assert.deepEqual(card.sections[1].type === 'list' && card.sections[1].items.map((i) => `${i.sign}${i.name}`), ['↑postApiV4ProjectsIdExport', '+Relation']);
 });
+
+test('CI: a changed pipeline variable is listed with its old and new values', () => {
+  const before = 'env:\n  NODE_VERSION: 24\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - run: make\n';
+  const card = ciCard('.github/workflows/docker.yml', before, before.replace('NODE_VERSION: 24', 'NODE_VERSION: 26'));
+  const vars = card.sections.find((s) => s.type === 'list' && s.title === 'Variables');
+  assert.deepEqual(vars?.type === 'list' && vars.items.map((i) => `${i.name}: ${i.detail}`), ['NODE_VERSION: 24 → 26']);
+  assert.ok(!pills(card).includes('formatting only'));
+});
+
+test("Dockerfile: an unnamed last stage is called 'final'", () => {
+  const card = dockerCard(null, 'FROM node:24 AS build\nRUN make\nFROM node:24-slim\nUSER node\nCMD ["node", "x.js"]\n');
+  assert.deepEqual(section(card, 'flow').steps.map((s) => s.name), ['build', 'final']);
+});
