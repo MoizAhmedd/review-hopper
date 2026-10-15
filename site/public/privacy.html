@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Review Hopper</title>
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icon.svg">
+<style>
+:root{--paper:#f5f4ef;--ink:#1d1d1f;--muted:#6b6a64;--rule:#e0ded6;--accent:#1f6f5c}
+@media (prefers-color-scheme:dark){:root{--paper:#121413;--ink:#ecebe6;--muted:#9a9a93;--rule:#2d302e;--accent:#6fc7a8}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+.wrap{max-width:680px;margin:0 auto;padding:40px 24px 72px}
+a{color:var(--accent)}
+h1{font-size:30px;margin:28px 0 4px}
+h2{font-size:18px;margin:32px 0 6px}
+.muted{color:var(--muted)}
+ul{padding-left:20px}
+li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a href="./">← Review Hopper</a>
+<h1>Privacy</h1>
+<p class="muted">Effective October 15, 2026.</p>
+
+<p>Review Hopper doesn't collect, send, sell or share any information about you or the code you
+review. There are no accounts, analytics or ads, and no Review Hopper server. It works entirely in
+your browser.</p>
+
+<h2>Where it runs</h2>
+<p>Only on gitlab.com and github.com, and it only acts on merge request and pull request review
+pages. On other pages of those sites it does nothing.</p>
+
+<h2>What it reads</h2>
+<ul>
+  <li>The list of changed files the review page already shows.</li>
+  <li>The old and new versions of some of those files (dependency manifests and lockfiles, database
+  migrations and schemas, Dockerfiles, CI config, API specs and markdown), downloaded from the same
+  site with the login you already have, so it can summarise or render them.</li>
+</ul>
+<p>Everything it reads is processed inside your browser.</p>
+
+<h2>What it stores</h2>
+<ul>
+  <li>Your settings from the toolbar popup, synced across your browsers if you use Chrome sync.</li>
+  <li>The summaries it makes, kept in memory for the browser session so a review you reopen loads
+  instantly. They're cleared when Chrome quits.</li>
+</ul>
+
+<h2>What it sends</h2>
+<p>Nothing, unless you ask. When you write a comment on a rendered document and click Comment,
+Review Hopper posts that comment to the merge request through GitLab's own API, exactly as if you
+had written it in GitLab.</p>
+
+<h2>Permissions</h2>
+<ul>
+  <li><strong>Access to gitlab.com and github.com:</strong> to change the review pages and read the
+  files in a review.</li>
+  <li><strong>Storage:</strong> for your settings and the session's summaries.</li>
+</ul>
+
+<h2>Contact</h2>
+<p>Questions or issues: <a href="https://github.com/MoizAhmedd/review-hopper/issues">github.com/MoizAhmedd/review-hopper/issues</a>.</p>
+</div>
+</body>
+</html>

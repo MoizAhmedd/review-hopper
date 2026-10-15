@@ -1,0 +1,29 @@
+{
+  "name": "review-hopper",
+  "version": "1.0.0",
+  "description": "Chrome extension that makes GitLab and GitHub review pages show what matters.",
+  "scripts": {
+    "build": "node scripts/build.ts",
+    "watch": "node scripts/build.ts --watch",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p .",
+    "e2e": "node e2e/run.mjs",
+    "zip": "npm run build && cd dist && zip -qr ../review-hopper.zip ."
+  },
+  "author": "Moiz Ahmed",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "markdown-it": "^15.0.2",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.5",
+    "@types/markdown-it": "^14.2.0",
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "puppeteer": "^25.14.0",
+    "typescript": "^7.0.2"
+  }
+}

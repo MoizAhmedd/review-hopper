@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.zip
+e2e/out/
+# Local only: mocks and notes reference work code.
+design/
+NOTES.md
+moiz-todo.md
